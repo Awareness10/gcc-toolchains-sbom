@@ -1,0 +1,168 @@
+{
+  "_comment": "Curated metadata for every crosstool-NG package the toolchains may use. Keys are crosstool-NG package directory names. 'relationship' is how the toolchain relates to the component: CONTAINS (installed into the toolchain) or STATIC_LINK (linked into the toolchain's host executables). Placeholders: {version}, {major} (first version field), {version_us} (dots replaced by underscores), {file} (source archive file name).",
+  "gcc": {
+    "name": "gcc",
+    "license": "GPL-3.0-or-later AND GPL-3.0-or-later WITH GCC-exception-3.1",
+    "supplier": "Organization: Free Software Foundation, Inc.",
+    "homepage": "https://gcc.gnu.org/",
+    "download": "https://ftp.gnu.org/gnu/gcc/gcc-{version}/{file}",
+    "cpe": "gnu:gcc",
+    "purpose": "APPLICATION",
+    "relationship": "CONTAINS",
+    "description": "GNU Compiler Collection (C, C++) including libgcc, libstdc++ and other target runtime libraries."
+  },
+  "binutils": {
+    "name": "binutils",
+    "license": "GPL-3.0-or-later",
+    "supplier": "Organization: Free Software Foundation, Inc.",
+    "homepage": "https://www.gnu.org/software/binutils/",
+    "download": "https://ftp.gnu.org/gnu/binutils/{file}",
+    "cpe": "gnu:binutils",
+    "purpose": "APPLICATION",
+    "relationship": "CONTAINS",
+    "description": "GNU assembler, linker and binary utilities."
+  },
+  "glibc": {
+    "name": "glibc",
+    "license": "LGPL-2.1-or-later",
+    "supplier": "Organization: Free Software Foundation, Inc.",
+    "homepage": "https://www.gnu.org/software/libc/",
+    "download": "https://ftp.gnu.org/gnu/glibc/{file}",
+    "cpe": "gnu:glibc",
+    "purpose": "LIBRARY",
+    "relationship": "CONTAINS",
+    "description": "GNU C Library installed in the target sysroot."
+  },
+  "linux": {
+    "name": "linux",
+    "license": "GPL-2.0-only WITH Linux-syscall-note",
+    "supplier": "Organization: The Linux Kernel Organization",
+    "homepage": "https://www.kernel.org/",
+    "download": "https://cdn.kernel.org/pub/linux/kernel/v{major}.x/{file}",
+    "cpe": "linux:linux_kernel",
+    "purpose": "SOURCE",
+    "relationship": "CONTAINS",
+    "description": "Linux kernel UAPI headers installed in the target sysroot (headers only, no kernel code)."
+  },
+  "gdb": {
+    "name": "gdb",
+    "license": "GPL-3.0-or-later",
+    "supplier": "Organization: Free Software Foundation, Inc.",
+    "homepage": "https://www.gnu.org/software/gdb/",
+    "download": "https://ftp.gnu.org/gnu/gdb/{file}",
+    "cpe": "gnu:gdb",
+    "purpose": "APPLICATION",
+    "relationship": "CONTAINS",
+    "description": "GNU debugger (cross gdb for the host, gdbserver for the target)."
+  },
+  "gmp": {
+    "name": "gmp",
+    "license": "LGPL-3.0-or-later OR GPL-2.0-or-later",
+    "supplier": "Organization: Free Software Foundation, Inc.",
+    "homepage": "https://gmplib.org/",
+    "download": "https://ftp.gnu.org/gnu/gmp/{file}",
+    "cpe": "gmplib:gmp",
+    "purpose": "LIBRARY",
+    "relationship": "STATIC_LINK",
+    "description": "GNU multiple precision arithmetic library (host, static)."
+  },
+  "mpfr": {
+    "name": "mpfr",
+    "license": "LGPL-3.0-or-later",
+    "supplier": "Organization: The MPFR team",
+    "homepage": "https://www.mpfr.org/",
+    "download": "https://www.mpfr.org/mpfr-{version}/{file}",
+    "cpe": null,
+    "purpose": "LIBRARY",
+    "relationship": "STATIC_LINK",
+    "description": "Multiple-precision floating-point library (host, static)."
+  },
+  "mpc": {
+    "name": "mpc",
+    "license": "LGPL-3.0-or-later",
+    "supplier": "Organization: The MPC team (INRIA)",
+    "homepage": "https://www.multiprecision.org/mpc/",
+    "download": "https://ftp.gnu.org/gnu/mpc/{file}",
+    "cpe": null,
+    "purpose": "LIBRARY",
+    "relationship": "STATIC_LINK",
+    "description": "Complex-number multiple-precision library (host, static)."
+  },
+  "isl": {
+    "name": "isl",
+    "license": "MIT",
+    "supplier": "Person: Sven Verdoolaege",
+    "homepage": "https://libisl.sourceforge.io/",
+    "download": "https://libisl.sourceforge.io/{file}",
+    "cpe": null,
+    "purpose": "LIBRARY",
+    "relationship": "STATIC_LINK",
+    "description": "Integer set library used by GCC's Graphite optimizer (host, static)."
+  },
+  "zlib": {
+    "name": "zlib",
+    "license": "Zlib",
+    "supplier": "Person: Jean-loup Gailly and Mark Adler",
+    "homepage": "https://zlib.net/",
+    "download": "https://github.com/madler/zlib/releases/download/v{version}/{file}",
+    "cpe": "zlib:zlib",
+    "purpose": "LIBRARY",
+    "relationship": "STATIC_LINK",
+    "description": "Compression library (host, static)."
+  },
+  "zstd": {
+    "name": "zstd",
+    "license": "BSD-3-Clause OR GPL-2.0-only",
+    "supplier": "Organization: Meta Platforms, Inc.",
+    "homepage": "https://facebook.github.io/zstd/",
+    "download": "https://github.com/facebook/zstd/releases/download/v{version}/{file}",
+    "cpe": "facebook:zstandard",
+    "purpose": "LIBRARY",
+    "relationship": "STATIC_LINK",
+    "description": "Zstandard compression library (host, static)."
+  },
+  "ncurses": {
+    "name": "ncurses",
+    "license": "X11-distribute-modifications-variant",
+    "supplier": "Organization: Free Software Foundation, Inc.",
+    "homepage": "https://invisible-island.net/ncurses/",
+    "download": "https://ftp.gnu.org/gnu/ncurses/{file}",
+    "cpe": "gnu:ncurses",
+    "purpose": "LIBRARY",
+    "relationship": "STATIC_LINK",
+    "description": "Terminal handling library used by gdb's TUI (host, static)."
+  },
+  "expat": {
+    "name": "expat",
+    "license": "MIT",
+    "supplier": "Organization: The Expat maintainers",
+    "homepage": "https://libexpat.github.io/",
+    "download": "https://github.com/libexpat/libexpat/releases/download/R_{version_us}/{file}",
+    "cpe": "libexpat_project:libexpat",
+    "purpose": "LIBRARY",
+    "relationship": "STATIC_LINK",
+    "description": "XML parser used by gdb (host, static)."
+  },
+  "libiconv": {
+    "name": "libiconv",
+    "license": "LGPL-2.1-or-later AND GPL-3.0-or-later",
+    "supplier": "Organization: Free Software Foundation, Inc.",
+    "homepage": "https://www.gnu.org/software/libiconv/",
+    "download": "https://ftp.gnu.org/gnu/libiconv/{file}",
+    "cpe": "gnu:libiconv",
+    "purpose": "LIBRARY",
+    "relationship": "STATIC_LINK",
+    "description": "Character set conversion library, built by crosstool-NG as a host companion library (static)."
+  },
+  "gettext": {
+    "name": "gettext",
+    "license": "GPL-3.0-or-later AND LGPL-2.1-or-later",
+    "supplier": "Organization: Free Software Foundation, Inc.",
+    "homepage": "https://www.gnu.org/software/gettext/",
+    "download": "https://ftp.gnu.org/gnu/gettext/{file}",
+    "cpe": "gnu:gettext",
+    "purpose": "LIBRARY",
+    "relationship": "STATIC_LINK",
+    "description": "Internationalization library, built by crosstool-NG as a host companion library (static)."
+  }
+}
