@@ -1,3 +1,14 @@
-src/
+# Build outputs: toolchain archives, SBOMs, and the cached upstream sources
 out/
-build/
+src/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store

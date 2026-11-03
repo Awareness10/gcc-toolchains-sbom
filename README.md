@@ -1,4 +1,6 @@
-# tcw: generic GCC toolchains with SPDX traceability
+# gcc-toolchains-sbom
+
+Generic GCC cross toolchains with full SPDX traceability.
 
 Builds two GNU/Linux cross toolchains with [crosstool-NG](https://crosstool-ng.github.io/)
 in a pinned Debian 10 container, and ships each with an SPDX 2.3 SBOM.
@@ -11,11 +13,18 @@ in a pinned Debian 10 container, and ships each with an SPDX 2.3 SBOM.
 | Contents | GCC 14.4.0 (C, C++), binutils 2.43.1, glibc 2.36, Linux 6.1.175 headers, gdb 16.3 + gdbserver |
 | Builder | crosstool-NG 1.29.0 |
 
+## Requirements
+
+- x86_64 Linux with Docker (rootless Docker works)
+- About 35 GB of free disk space, mostly in the `tcw-build` Docker volume, which holds
+  crosstool-NG's working directories (about 16 GB per toolchain)
+- Internet access for the first build (Debian archive, upstream source archives)
+
 ## Usage
 
-Requires Docker (rootless Docker works).
-
 ```sh
+git clone https://github.com/Awareness10/gcc-toolchains-sbom.git
+cd gcc-toolchains-sbom
 ./build.sh                            # everything: image, unit tests, both toolchains, SBOM validation
 ./build.sh x86_64-unknown-linux-gnu   # one toolchain
 ./build.sh validate                   # validate out/*.spdx.json and check out/*.sha256
@@ -31,6 +40,13 @@ Settings (environment variables):
 
 Each toolchain takes about 10 minutes on a 16-thread machine. Each archive is about 80–90 MB,
 and each SBOM about 5 MB (it lists every file, about 4,300 per toolchain).
+
+To free the disk space afterwards (`out/` and `src/` are kept):
+
+```sh
+docker volume rm tcw-build
+docker image rm tcw-builder:1.0.0 tcw-spdx-validate:1.0.0
+```
 
 ## Outputs
 
@@ -146,5 +162,15 @@ docs/plans/                   design and implementation plan
 - libiconv and gettext are built by crosstool-NG as host companion libraries. They are recorded as
   `STATIC_LINK` to be safe, even though on a glibc host the tools may not use them.
 - Debian 10 is end of life. Its packages come from the frozen `archive.debian.org`, which also
-  keeps the build environment reproducible. It only builds the toolchain; nothing from it ships
-  except the glibc 2.28 compatibility requirement.
+  keeps the build environment reproducible. Only the build host is Debian 10. The parts of it that
+  end up in the toolchain (static libstdc++, libgcc and glibc startup files in the host tools) are
+  recorded in the SBOM as `STATIC_LINK`.
+- Archives are packed reproducibly (sorted, fixed timestamps and owners), but the build is not
+  verified to be bit-for-bit reproducible.
+
+## License
+
+The build scripts and SBOM tooling in this repository are licensed under the [MIT License](LICENSE).
+The toolchains they produce contain GCC, binutils, glibc, gdb and other components under their own
+licenses, mostly GPL and LGPL. Those licenses are listed per component in each SBOM, and their texts
+are shipped in each toolchain's `share/licenses/`.
