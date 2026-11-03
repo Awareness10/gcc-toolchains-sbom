@@ -252,7 +252,7 @@ class BuildDocumentTest(unittest.TestCase):
                 {"path": "include/readme", "sha1": "9" * 40, "sha256": "b" * 64,
                  "kind": None, "pkg": None},
             ],
-            "ctng": {"version": "1.29.0", "url": "https://example/ct.tar.xz",
+            "ctng": {"version": "1.29.0", "url": "https://example.org/ct.tar.xz",
                      "sha512": "c" * 128, "sha256": "d" * 64},
             "base_image": "debian:10@sha256:" + "0" * 64,
             "dpkg": [
