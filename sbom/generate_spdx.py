@@ -151,10 +151,14 @@ ATTRIBUTION_RULES = [
     (r"(?:^|/)gdbserver$", "gdb"),
     (r"(?:^|/)libinproctrace\.so$", "gdb"),
     (r"^share/gdb/", "gdb"),
+    # gdbserver's build installs the target bfd/opcodes/libctf/libsframe from gdb's source tree.
+    (r"^{t}/debug-root/", "gdb"),
     (r"^bin/{t}-(?:gcc(?:-[0-9.]+|-ar|-nm|-ranlib)?|g\+\+|c\+\+|cpp|gcov(?:-dump|-tool)?"
      r"|lto-dump)$", "gcc"),
     (r"^(?:libexec|lib)/gcc/", "gcc"),
-    (r"^lib/bfd-plugins/", "gcc"),
+    (r"^lib/bfd-plugins/liblto_plugin\.so$", "gcc"),
+    (r"^lib/bfd-plugins/libdep\.so$", "binutils"),
+    (r"^lib/libcc1\.so", "gcc"),
     (r"^{t}/include/c\+\+/", "gcc"),
     (r"^bin/{t}-(?:addr2line|ar|as|c\+\+filt|elfedit|gprof|ld(?:\.bfd)?|nm|objcopy|objdump"
      r"|ranlib|readelf|size|strings|strip)$", "binutils"),
