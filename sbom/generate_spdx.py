@@ -406,9 +406,9 @@ def build_document(inp):
     })
     rel(img_id, "BUILD_TOOL_OF", root)
 
-    for d in inp["dpkg"]:
+    def deb_package(d, comment=None):
         did = ids.new("Package", "deb", d["name"], d["arch"])
-        packages.append({
+        entry = {
             "SPDXID": did,
             "name": d["name"],
             "versionInfo": d["version"],
@@ -422,11 +422,25 @@ def build_document(inp):
             "sourceInfo": "Debian source package %s %s" % (d["source"], d["source_version"]),
             "externalRefs": [{"referenceCategory": "PACKAGE-MANAGER", "referenceType": "purl",
                               "referenceLocator": deb_purl(d)}],
-        })
+        }
+        if comment:
+            entry["comment"] = comment
+        packages.append(entry)
+        return did
+
+    for d in inp["dpkg"]:
+        did = deb_package(d)
         rel(did, "BUILD_TOOL_OF", root)
         if d["name"] == "libc6":
             # Toolchain host executables are linked against the build host's glibc 2.28.
             rel(root, "DYNAMIC_LINK", did)
+
+    # Installed only while compiling crosstool-NG, then purged so they cannot leak
+    # into the toolchain (e.g. host ncurses into gdb).
+    for d in inp.get("ctng_build_deps", []):
+        did = deb_package(d, "Installed only to compile crosstool-NG; removed from the "
+                             "build environment before any toolchain was built.")
+        rel(did, "BUILD_DEPENDENCY_OF", ctng_id)
 
     creators = ["Tool: %s-%s" % (TOOL_NAME, TOOL_VERSION),
                 "Tool: crosstool-NG-%s" % ctng["version"]]
@@ -459,6 +473,8 @@ def main(argv=None):
     ap.add_argument("--build-info", default="/etc/tcw/build-info.json")
     ap.add_argument("--ctng-tarball", default=None,
                     help="crosstool-NG source archive (default: /opt/ctng/src/<url basename>)")
+    ap.add_argument("--ctng-build-deps", default="/etc/tcw/ctng-build-deps.dpkg",
+                    help="dpkg-query output for packages used only to compile crosstool-NG")
     ap.add_argument("--dpkg-file", default=None, help="dpkg-query output (default: run dpkg-query)")
     a = ap.parse_args(argv)
 
@@ -503,6 +519,11 @@ def main(argv=None):
             ["dpkg-query", "-W", "-f", DPKG_FORMAT],
             universal_newlines=True)
 
+    ctng_build_deps = []
+    if os.path.isfile(a.ctng_build_deps):
+        with open(a.ctng_build_deps) as f:
+            ctng_build_deps = dpkg_packages(f.read())
+
     tar_sha256 = file_digests(a.tarball, ("sha256",))["sha256"]
     epoch = os.environ.get("SOURCE_DATE_EPOCH")
     now = (datetime.datetime.utcfromtimestamp(int(epoch)) if epoch
@@ -521,6 +542,7 @@ def main(argv=None):
                  "sha512": info["ctng_sha512"], "sha256": ctng_dg["sha256"]},
         "base_image": info["base_image"],
         "dpkg": dpkg_packages(dpkg_text),
+        "ctng_build_deps": ctng_build_deps,
     })
     with open(a.out, "w") as f:
         json.dump(doc, f, indent=1, sort_keys=False)

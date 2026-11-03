@@ -261,7 +261,18 @@ class BuildDocumentTest(unittest.TestCase):
                 {"name": "make", "version": "4.2.1-1.2", "arch": "amd64",
                  "source": "make-dfsg", "source_version": "4.2.1-1.2"},
             ],
+            "ctng_build_deps": [
+                {"name": "libncurses-dev", "version": "6.1+20181013-2+deb10u5", "arch": "amd64",
+                 "source": "ncurses", "source_version": "6.1+20181013-2+deb10u5"},
+            ],
         }
+
+    def test_ctng_build_only_dependencies(self):
+        dev = self.pkg("libncurses-dev")
+        self.assertTrue(self.rel(dev["SPDXID"], "BUILD_DEPENDENCY_OF",
+                                 self.pkg("crosstool-ng")["SPDXID"]))
+        root = self.pkg("%s-toolchain" % T)["SPDXID"]
+        self.assertFalse(self.rel(dev["SPDXID"], "BUILD_TOOL_OF", root))
 
     def pkg(self, name):
         return next(p for p in self.doc["packages"] if p["name"] == name)

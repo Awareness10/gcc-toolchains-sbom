@@ -21,13 +21,23 @@ RUN printf '%s\n' \
  && rm -rf /var/lib/apt/lists/*
 
 # crosstool-NG, verified against a pinned SHA-512. The source tarball is kept for compliance.
-RUN mkdir -p /opt/ctng/src /tmp/ctng && cd /tmp/ctng \
+# ctng-build-deps.lock (ncurses headers for ct-ng's kconfig) is installed only for this step,
+# recorded, and purged again: if left installed, gdb's configure would link the host's
+# libncursesw instead of crosstool-NG's static ncurses.
+COPY ctng-build-deps.lock /etc/tcw/ctng-build-deps.lock
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends $(cat /etc/tcw/ctng-build-deps.lock) \
+ && dpkg-query -W -f '${db:Status-Status}\t${Package}\t${Version}\t${Architecture}\t${source:Package}\t${source:Version}\n' \
+      $(sed 's/=.*//' /etc/tcw/ctng-build-deps.lock) > /etc/tcw/ctng-build-deps.dpkg \
+ && mkdir -p /opt/ctng/src /tmp/ctng && cd /tmp/ctng \
  && curl -fsSL -o /opt/ctng/src/crosstool-ng-${CTNG_VERSION}.tar.xz "${CTNG_URL}" \
  && echo "${CTNG_SHA512}  /opt/ctng/src/crosstool-ng-${CTNG_VERSION}.tar.xz" | sha512sum -c - \
  && tar xf /opt/ctng/src/crosstool-ng-${CTNG_VERSION}.tar.xz --strip-components=1 \
  && ./configure --prefix=/opt/ctng \
  && make -j"$(nproc)" && make install \
- && cd / && rm -rf /tmp/ctng
+ && cd / && rm -rf /tmp/ctng \
+ && apt-get purge -y $(sed 's/=.*//' /etc/tcw/ctng-build-deps.lock) \
+ && rm -rf /var/lib/apt/lists/*
 ENV PATH=/opt/ctng/bin:${PATH}
 
 # Provenance record consumed by the SBOM generator.

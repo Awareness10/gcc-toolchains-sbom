@@ -11,7 +11,6 @@ gawk=1:4.2.1+dfsg-1
 gcc=4:8.3.0-1
 gettext=0.19.8.1-9
 help2man=1.47.8
-libncurses5-dev=6.1+20181013-2+deb10u5
 libtool=2.4.6-9
 libtool-bin=2.4.6-9
 lzip=1.21-3
