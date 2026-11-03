@@ -40,5 +40,6 @@ python3 "$ROOT/sbom/generate_spdx.py" --target "$T" --version "$VERSION" \
   --config "$WORK/.config" --src-dir /build/src --prefix "$PREFIX" \
   --tarball "$OUT/$T.tar.xz" --out "$OUT/$T.spdx.json"
 
-(cd "$OUT" && sha256sum "$T.tar.xz" "$T.spdx.json" > "$T.sha256")
+cp "$WORK/.config" "$OUT/$T.config"
+(cd "$OUT" && sha256sum "$T.tar.xz" "$T.spdx.json" "$T.config" > "$T.sha256")
 echo "==> [$T] done"

@@ -221,6 +221,12 @@ def deb_purl(p):
         quote(p["name"], safe=".-_~"), quote(p["version"], safe=".-_~"), p["arch"])
 
 
+# Debian packages whose static objects end up inside the toolchain's host executables:
+# glibc startup files (crt1.o, crti.o, libc_nonshared.a) and the host compiler's
+# libgcc / libstdc++ (linked with -static-libgcc -static-libstdc++).
+HOST_STATIC_DEBS = ("libc6-dev", "libgcc-8-dev", "libstdc++-8-dev")
+
+
 def verification_code(sha1s):
     return hashlib.sha1("".join(sorted(sha1s)).encode()).hexdigest()
 
@@ -428,12 +434,17 @@ def build_document(inp):
         packages.append(entry)
         return did
 
+    missing = set(HOST_STATIC_DEBS) - {d["name"] for d in inp["dpkg"]}
+    if missing:
+        raise SbomError("build environment lacks %s" % ", ".join(sorted(missing)))
     for d in inp["dpkg"]:
         did = deb_package(d)
         rel(did, "BUILD_TOOL_OF", root)
         if d["name"] == "libc6":
             # Toolchain host executables are linked against the build host's glibc 2.28.
             rel(root, "DYNAMIC_LINK", did)
+        if d["name"] in HOST_STATIC_DEBS:
+            rel(root, "STATIC_LINK", did)
 
     # Installed only while compiling crosstool-NG, then purged so they cannot leak
     # into the toolchain (e.g. host ncurses into gdb).

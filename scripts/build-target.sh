@@ -20,6 +20,6 @@ runuser -u builder -- env \
   /work/scripts/ctng-build.sh "$T"
 
 install -d /work/out /work/src
-cp "/build/out/$T.tar.xz" "/build/out/$T.spdx.json" "/build/out/$T.sha256" /work/out/
+cp "/build/out/$T.tar.xz" "/build/out/$T.spdx.json" "/build/out/$T.config" "/build/out/$T.sha256" /work/out/
 cp -n /build/src/* /work/src/
 chown "$owner" /work/out /work/src "/work/out/$T".* /work/src/*

@@ -260,12 +260,31 @@ class BuildDocumentTest(unittest.TestCase):
                  "source": "glibc", "source_version": "2.28-10+deb10u4"},
                 {"name": "make", "version": "4.2.1-1.2", "arch": "amd64",
                  "source": "make-dfsg", "source_version": "4.2.1-1.2"},
+                {"name": "libc6-dev", "version": "2.28-10+deb10u4", "arch": "amd64",
+                 "source": "glibc", "source_version": "2.28-10+deb10u4"},
+                {"name": "libgcc-8-dev", "version": "8.3.0-6", "arch": "amd64",
+                 "source": "gcc-8", "source_version": "8.3.0-6"},
+                {"name": "libstdc++-8-dev", "version": "8.3.0-6", "arch": "amd64",
+                 "source": "gcc-8", "source_version": "8.3.0-6"},
             ],
             "ctng_build_deps": [
                 {"name": "libncurses-dev", "version": "6.1+20181013-2+deb10u5", "arch": "amd64",
                  "source": "ncurses", "source_version": "6.1+20181013-2+deb10u5"},
             ],
         }
+
+    def test_host_runtime_debs_are_static_links(self):
+        root = self.pkg("%s-toolchain" % T)["SPDXID"]
+        for name in ("libc6-dev", "libgcc-8-dev", "libstdc++-8-dev"):
+            with self.subTest(name=name):
+                self.assertTrue(self.rel(root, "STATIC_LINK", self.pkg(name)["SPDXID"]))
+        self.assertFalse(self.rel(root, "STATIC_LINK", self.pkg("make")["SPDXID"]))
+
+    def test_missing_host_runtime_deb_is_an_error(self):
+        inp = self.inputs()
+        inp["dpkg"] = [d for d in inp["dpkg"] if d["name"] != "libstdc++-8-dev"]
+        with self.assertRaisesRegex(g.SbomError, "libstdc\\+\\+-8-dev"):
+            g.build_document(inp)
 
     def test_ctng_build_only_dependencies(self):
         dev = self.pkg("libncurses-dev")
