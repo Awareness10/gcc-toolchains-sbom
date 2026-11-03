@@ -29,7 +29,8 @@ Settings (environment variables):
 | `OFFLINE=1` | Forbid downloads; build only from the source archives in `src/` |
 | `SOURCE_DATE_EPOCH` | Timestamp for the archive and SBOM (default: last commit time) |
 
-Each toolchain takes about 10 minutes on a 16-thread machine.
+Each toolchain takes about 10 minutes on a 16-thread machine. Each archive is about 80–90 MB,
+and each SBOM about 5 MB (it lists every file, about 4,300 per toolchain).
 
 ## Outputs
 
@@ -86,15 +87,25 @@ Everything is derived from the build inputs, not by scanning afterwards.
 
 ```sh
 S=out/x86_64-unknown-linux-gnu.spdx.json
-# shipped components with versions and licenses
-jq -r '.packages[] | select(.primaryPackagePurpose != null and .supplier != "Organization: Debian")
-       | [.name, .versionInfo, .licenseDeclared] | @tsv' $S
+
+# components shipped in or statically linked into the toolchain: name, version, license, relationship
+jq -r '. as $d | ($d.packages[] | select(.name | endswith("-toolchain")).SPDXID) as $r
+  | $d.relationships[] | select(.spdxElementId == $r and
+      (.relationshipType == "CONTAINS" or .relationshipType == "STATIC_LINK")) as $rel
+  | $d.packages[] | select(.SPDXID == $rel.relatedSpdxElement)
+  | [.name, .versionInfo, .licenseDeclared, $rel.relationshipType] | @tsv' $S
+
 # patches applied to glibc
-jq -r --arg id "$(jq -r '.packages[]|select(.name=="glibc").SPDXID' $S)" \
-   '.relationships[]|select(.relationshipType=="PATCH_APPLIED" and .relatedSpdxElement==$id).spdxElementId' $S
-# which component a binary comes from
-jq -r '. as $d | .files[] | select(.fileName|endswith("bin/x86_64-unknown-linux-gnu-ld.bfd")) | .SPDXID as $f
-       | $d.relationships[] | select(.spdxElementId==$f and .relationshipType=="GENERATED_FROM").relatedSpdxElement' $S
+jq -r '.relationships[] | select(.relationshipType == "PATCH_APPLIED"
+  and .relatedSpdxElement == "SPDXRef-Package-glibc").spdxElementId' $S
+
+# which component a file was built from
+jq -r '. as $d | .files[] | select(.fileName | endswith("bin/x86_64-unknown-linux-gnu-ld.bfd")).SPDXID as $f
+  | $d.relationships[] | select(.spdxElementId == $f and .relationshipType == "GENERATED_FROM")
+  | .relatedSpdxElement' $S
+
+# relationship overview
+jq -r '.relationships | group_by(.relationshipType)[] | "\(.[0].relationshipType)\t\(length)"' $S
 ```
 
 ## Verification

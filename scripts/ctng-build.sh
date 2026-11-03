@@ -32,7 +32,7 @@ echo "==> [$T] smoke tests"
 
 echo "==> [$T] packing"
 rm -f "$OUT/$T".*
-tar --sort=name --mtime="@$SOURCE_DATE_EPOCH" --owner=0 --group=0 --numeric-owner \
+tar --sort=name --mtime="@$SOURCE_DATE_EPOCH" --owner=0 --group=0 --numeric-owner --mode=u+w \
     --format=gnu -C "$(dirname "$PREFIX")" -cf - "$T" | xz -9 -T0 > "$OUT/$T.tar.xz"
 
 echo "==> [$T] SBOM"
