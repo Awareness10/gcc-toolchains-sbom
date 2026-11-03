@@ -20,6 +20,9 @@ in a pinned Debian 10 container, and ships each with an SPDX 2.3 SBOM.
   crosstool-NG's working directories (about 16 GB per toolchain)
 - Internet access for the first build (Debian archive, upstream source archives)
 
+`build.sh` checks these first. If Docker is missing, not running, or not usable by your user,
+it stops with instructions for fixing it, and it warns when disk space looks too low.
+
 ## Usage
 
 ```sh
@@ -29,6 +32,7 @@ cd gcc-toolchains-sbom
 ./build.sh x86_64-unknown-linux-gnu   # one toolchain
 ./build.sh validate                   # validate out/*.spdx.json and check out/*.sha256
 ./build.sh unittest                   # SBOM generator tests + config checks
+./build.sh help                       # list commands
 ```
 
 Settings (environment variables):
